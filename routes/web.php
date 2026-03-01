@@ -4,14 +4,10 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ActivityLogController;
 use App\Http\Controllers\AnalyticsController;
+use App\Http\Controllers\LandingController;
 use App\Http\Controllers\SettingsController;
 
-Route::get('/', function () {
-    if (auth()->check()) {
-        return redirect()->route('dashboard');
-    }
-    return view('landing');
-});
+Route::get('/', LandingController::class);
 
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
@@ -25,5 +21,3 @@ Route::middleware('auth')->group(function () {
     Route::post('/settings/ecopay/add-coins', [SettingsController::class, 'addCoins'])->name('settings.ecopay.addCoins');
     Route::delete('/activity-log/{id}', [ActivityLogController::class, 'delete'])->name('activity-log.delete');
 });
-
-require __DIR__.'/auth.php';

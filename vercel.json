@@ -1,0 +1,22 @@
+{
+    "version": 2,
+    "framework": null,
+    "functions": [
+        {
+            "src": "api/index.php",
+            "runtime": "vercel-php@0.7.3"
+        }
+    ],
+    "routes": [
+        {
+            "src": "/(.*)",
+            "dest": "/api/index.php"
+        }
+    ],
+    "build": {
+        "env": {
+            "PHP_VERSION": "8.2"
+        }
+    },
+    "outputDirectory": "public"
+}
