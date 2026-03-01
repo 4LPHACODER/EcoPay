@@ -18,5 +18,7 @@
             "PHP_VERSION": "8.2"
         }
     },
-    "outputDirectory": "public"
+    "outputDirectory": "public",
+    "installCommand": "composer install --optimize-autoloader --no-dev",
+    "buildCommand": "php artisan route:cache && php artisan config:cache && php artisan view:cache"
 }

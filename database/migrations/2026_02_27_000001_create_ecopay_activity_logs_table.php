@@ -9,11 +9,13 @@ return new class extends Migration
 {
     public function up(): void
     {
-        // Ensure pgcrypto extension in case migrations run separately
-        DB::statement('CREATE EXTENSION IF NOT EXISTS "pgcrypto";');
+        // Ensure pgcrypto extension exists only for PostgreSQL
+        if (DB::getDriverName() === 'pgsql') {
+            DB::statement('CREATE EXTENSION IF NOT EXISTS "pgcrypto";');
+        }
 
         Schema::create('ecopay_activity_logs', function (Blueprint $table) {
-            $table->uuid('id')->primary()->default(DB::raw('gen_random_uuid()'));
+            $table->uuid('id')->primary();
             $table->uuid('account_id');
             $table->enum('bottle_type', ['plastic', 'metal']);
             $table->integer('coins_earned')->default(0);
@@ -25,6 +27,11 @@ return new class extends Migration
                 ->on('ecopay_accounts')
                 ->onDelete('cascade');
         });
+
+        // Set default UUIDs using raw SQL based on driver
+        if (DB::getDriverName() === 'pgsql') {
+            DB::statement('ALTER TABLE ecopay_activity_logs ALTER COLUMN id SET DEFAULT gen_random_uuid();');
+        }
     }
 
     public function down(): void
