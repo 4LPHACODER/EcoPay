@@ -4,21 +4,16 @@ namespace App\Services;
 
 use App\Models\EcopayAccount;
 use App\Models\EcopayActivityLog;
-use Illuminate\Support\Str;
-use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class EcopayService
 {
     /**
      * Record a bottle deposit for the given user email.
      *
-     * @param string $email
-     * @param string $bottleType 'plastic'|'metal'
-     * @param int $coinsEarned
-     * @param string|null $description
-     *
-     * @return EcopayActivityLog
+     * @param  string  $bottleType  'plastic'|'metal'
      */
     public function recordBottleDeposit(string $email, string $bottleType, int $coinsEarned = 0, ?string $description = null): EcopayActivityLog
     {

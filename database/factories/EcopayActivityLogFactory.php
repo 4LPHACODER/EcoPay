@@ -2,9 +2,9 @@
 
 namespace Database\Factories;
 
+use App\Models\EcopayActivityLog;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
-use App\Models\EcopayActivityLog;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\EcopayActivityLog>

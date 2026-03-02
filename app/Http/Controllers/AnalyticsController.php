@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use App\Models\EcopayAccount;
 use App\Models\EcopayActivityLog;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class AnalyticsController extends Controller
 {
@@ -52,7 +52,7 @@ class AnalyticsController extends Controller
             // Try to use activity logs if model/table exists
             try {
                 $rows = EcopayActivityLog::query()
-                    ->selectRaw("DATE(created_at) as day, SUM(coins_earned) as coins_sum")
+                    ->selectRaw('DATE(created_at) as day, SUM(coins_earned) as coins_sum')
                     ->where('account_id', $account->id)
                     ->groupBy('day')
                     ->orderBy('day')

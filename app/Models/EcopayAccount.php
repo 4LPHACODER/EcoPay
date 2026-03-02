@@ -10,6 +10,7 @@ class EcopayAccount extends Model
     use HasFactory;
 
     public $incrementing = false;
+
     protected $keyType = 'string';
 
     protected $table = 'ecopay_accounts';

@@ -5,7 +5,12 @@ import react from '@vitejs/plugin-react';
 export default defineConfig({
     plugins: [
         laravel({
-            input: 'resources/js/app.jsx',
+            input: [
+                'resources/js/app.jsx',
+                'resources/js/landing.js',
+                'resources/js/analytics.js',
+                'resources/js/dashboard-realtime.js',
+            ],
             refresh: true,
         }),
         react(),

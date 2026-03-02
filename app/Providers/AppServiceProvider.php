@@ -24,6 +24,12 @@ class AppServiceProvider extends ServiceProvider
         // Force HTTPS in production behind Railway proxy
         if ($this->app->environment('production')) {
             URL::forceScheme('https');
+
+            // Force HTTPS for Vite assets
+            $assetUrl = config('app.asset_url');
+            if ($assetUrl && ! str_starts_with($assetUrl, 'https://')) {
+                config(['app.asset_url' => 'https://'.ltrim($assetUrl, 'https://')]);
+            }
         }
 
         Vite::prefetch(concurrency: 3);

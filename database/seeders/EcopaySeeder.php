@@ -2,10 +2,10 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
-use App\Models\User;
 use App\Models\EcopayAccount;
+use App\Models\User;
 use App\Services\EcopayService;
+use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
 
 class EcopaySeeder extends Seeder
@@ -14,7 +14,7 @@ class EcopaySeeder extends Seeder
     {
         // Create a demo user if none exists
         $user = User::where('email', 'admin@ecopay.com')->first();
-        
+
         if (! $user) {
             $user = User::create([
                 'name' => 'Admin',
@@ -36,7 +36,7 @@ class EcopaySeeder extends Seeder
         );
 
         // Use service to record 3 deposits: 2 plastic, 1 metal -> total coins 10
-        $service = new EcopayService();
+        $service = new EcopayService;
 
         // Example deposits
         $service->recordBottleDeposit($user->email, 'plastic', 4, 'Plastic Detected – The user drop a plastic in EcoPay and the cash is also drop');
