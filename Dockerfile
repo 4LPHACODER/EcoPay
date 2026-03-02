@@ -1,51 +1,53 @@
-# ==========================
-# EcoPay - Laravel on Render
-# ==========================
-FROM php:8.2-apache
+# ---------- PHP + Nginx production image ----------
+FROM php:8.2-fpm-alpine
 
-# ---- System dependencies + PHP extensions ----
-RUN apt-get update && apt-get install -y \
-    git unzip curl ca-certificates \
-    libzip-dev libpq-dev \
-  && docker-php-ext-install pdo pdo_pgsql zip \
-  && a2enmod rewrite headers \
-  && rm -rf /var/lib/apt/lists/*
+# System deps
+RUN apk add --no-cache \
+    nginx \
+    bash \
+    curl \
+    git \
+    unzip \
+    icu-dev \
+    oniguruma-dev \
+    libzip-dev \
+    postgresql-dev \
+    supervisor
 
-# ---- Set Apache document root to /public ----
-ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
-RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf \
- && sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
+# PHP extensions
+RUN docker-php-ext-install \
+    pdo \
+    pdo_pgsql \
+    intl \
+    mbstring \
+    zip \
+    opcache
 
-# ---- Composer ----
+# Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
-# ---- App files ----
+# App directory
 WORKDIR /var/www/html
+
+# Copy app
 COPY . .
 
-# ---- Install PHP dependencies ----
-# (If your repo includes vendor already, this will still be fine)
-RUN composer install --no-dev --optimize-autoloader --no-interaction
+# Install PHP deps (no dev)
+RUN composer install --no-dev --optimize-autoloader
 
-# ---- Laravel writable folders ----
+# Laravel permissions
 RUN mkdir -p storage bootstrap/cache \
- && chown -R www-data:www-data storage bootstrap/cache \
  && chmod -R 775 storage bootstrap/cache
 
-# ---- Ensure Apache listens on Render's $PORT ----
-# Render provides PORT dynamically. We must bind Apache to it.
-RUN printf 'Listen ${PORT}\n' > /etc/apache2/ports.conf
+# Nginx config
+RUN rm -f /etc/nginx/http.d/default.conf
+COPY docker/nginx.conf /etc/nginx/http.d/default.conf
 
-# Also update default vhost to use the same port placeholder
-RUN sed -i 's/<VirtualHost \*:80>/<VirtualHost *:${PORT}>/g' /etc/apache2/sites-available/000-default.conf
+# Supervisor config
+COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
-# ---- Optional: health endpoint without Laravel (helps Render health checks) ----
-# Not required, but useful.
-RUN echo "OK" > /var/www/html/public/health.txt
+# Expose port (Railway provides $PORT)
+EXPOSE 8080
 
-# ---- Expose a default, Render will override with $PORT ----
-EXPOSE 10000
-
-# ---- Start Apache ----
-# IMPORTANT: Do NOT run migrations here unless you really want it at every boot.
-CMD ["apache2-foreground"]
+# Run migrations then start services
+CMD ["sh", "-lc", "php artisan config:cache || true && php artisan route:cache || true && php artisan view:cache || true && php artisan migrate --force || true && supervisord -c /etc/supervisor/conf.d/supervisord.conf"]
