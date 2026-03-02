@@ -1,7 +1,9 @@
-# ---------- PHP + Nginx production image ----------
+# ---------- Laravel (PHP-FPM) + Nginx (Alpine) ----------
 FROM php:8.2-fpm-alpine
 
-# System deps (add nodejs + npm)
+# ----------------------------
+# System dependencies
+# ----------------------------
 RUN apk add --no-cache \
     nginx \
     bash \
@@ -16,7 +18,9 @@ RUN apk add --no-cache \
     nodejs \
     npm
 
+# ----------------------------
 # PHP extensions
+# ----------------------------
 RUN docker-php-ext-install \
     pdo \
     pdo_pgsql \
@@ -25,43 +29,54 @@ RUN docker-php-ext-install \
     zip \
     opcache
 
+# ----------------------------
 # Composer
+# ----------------------------
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
+# ----------------------------
 # App directory
+# ----------------------------
 WORKDIR /var/www/html
-
-# Copy app
 COPY . .
 
+# ----------------------------
+# Ensure temp dir + storage perms (fix tempnam() / cache issues)
+# ----------------------------
+ENV TMPDIR=/tmp
+RUN chmod 1777 /tmp \
+ && mkdir -p storage bootstrap/cache storage/framework/{cache,sessions,views} \
+ && chown -R www-data:www-data /var/www/html \
+ && chmod -R 775 storage bootstrap/cache
+
+# ----------------------------
+# Install Node deps & build Vite assets (creates public/build/manifest.json)
+# ----------------------------
+RUN if [ -f package-lock.json ]; then npm ci; else npm install; fi \
+ && npm run build
+
+# ----------------------------
 # Install PHP deps (no dev)
-RUN composer install --no-dev --optimize-autoloader
+# ----------------------------
+RUN composer install --no-dev --optimize-autoloader --no-interaction
 
-# Install Node deps + build Vite assets (THIS CREATES public/build/manifest.json)
-RUN npm ci || npm install
-RUN npm run build
-
-# Laravel permissions + required runtime dirs (fix tempnam / view cache issues)
-RUN mkdir -p \
-    storage/framework/cache \
-    storage/framework/sessions \
-    storage/framework/views \
-    storage/logs \
-    bootstrap/cache \
-    /tmp \
- && chmod -R 775 storage bootstrap/cache /tmp
-
+# ----------------------------
 # Nginx config
+# ----------------------------
 RUN rm -f /etc/nginx/http.d/default.conf
 COPY docker/nginx.conf /etc/nginx/http.d/default.conf
 
+# ----------------------------
 # Supervisor config
+# ----------------------------
 COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
-# Expose port (Railway provides $PORT)
+# Railway provides $PORT; your Nginx should listen on 8080 internally
 EXPOSE 8080
 
-# Run migrations then start services
+# ----------------------------
+# Start: cache (safe) + migrate (safe) + run supervisor
+# ----------------------------
 CMD ["sh", "-lc", "\
 php artisan config:cache || true && \
 php artisan route:cache || true && \
