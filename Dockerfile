@@ -83,4 +83,4 @@ COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 EXPOSE 8080
 
-CMD ["sh", "-lc", "php artisan config:clear && php artisan route:clear && php artisan view:clear && php artisan migrate --force || true && supervisord -c /etc/supervisor/conf.d/supervisord.conf"]
+CMD ["sh", "-lc", "php artisan config:clear && php artisan route:clear && php artisan view:clear && php artisan cache:clear && php artisan config:cache && php artisan route:cache && php artisan view:cache && php artisan migrate --force || true && supervisord -c /etc/supervisor/conf.d/supervisord.conf"]
