@@ -1,4 +1,6 @@
 // Landing Page Carousel
+import '../css/app.css';
+
 document.addEventListener('DOMContentLoaded', function() {
     const carousel = document.getElementById('hero-carousel');
     if (!carousel) return;
