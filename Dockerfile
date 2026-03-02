@@ -1,35 +1,39 @@
 ########################################
-# Stage 1 — Node + PHP (Build assets)
+# Stage 1 — PHP + Node (Build assets)
 ########################################
-FROM node:20-alpine AS node-build
+FROM php:8.2-cli-alpine AS build
 
-# Install PHP in build stage (needed for wayfinder)
-RUN apk add --no-cache php82 php82-cli php82-mbstring php82-openssl php82-pdo php82-tokenizer php82-json php82-phar php82-fileinfo
+# System deps + Node (for Vite build)
+RUN apk add --no-cache \
+    nodejs npm \
+    bash curl git unzip \
+    icu-dev oniguruma-dev libzip-dev postgresql-dev
+
+# PHP extensions (needed by Laravel)
+RUN docker-php-ext-install \
+    pdo pdo_pgsql intl mbstring zip
 
 WORKDIR /app
 
-# Copy package files first (for caching)
-COPY package*.json ./
-RUN npm ci
+# Composer
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
-# Copy the rest of the app
+# Copy project
 COPY . .
 
-# Install Composer dependencies (needed for artisan during build)
-RUN apk add --no-cache curl git unzip \
- && curl -sS https://getcomposer.org/installer | php82 -- --install-dir=/usr/bin --filename=composer \
- && composer install --no-dev --optimize-autoloader
+# Install PHP deps (needed for artisan during build)
+RUN composer install --no-dev --optimize-autoloader
 
-# Build Vite assets (this now works because PHP exists)
-RUN npm run build
+# Install JS deps + build Vite (Wayfinder runs here, PHP exists ✅)
+RUN npm ci && npm run build
 
 
 ########################################
-# Stage 2 — PHP + Nginx Runtime
+# Stage 2 — PHP-FPM + Nginx Runtime
 ########################################
 FROM php:8.2-fpm-alpine
 
-# System dependencies
+# System deps
 RUN apk add --no-cache \
     nginx \
     bash \
@@ -51,7 +55,7 @@ RUN docker-php-ext-install \
     zip \
     opcache
 
-# Copy Composer
+# Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www/html
@@ -62,19 +66,19 @@ COPY . .
 # Install PHP deps
 RUN composer install --no-dev --optimize-autoloader
 
-# Copy built assets from Node stage
-COPY --from=node-build /app/public/build /var/www/html/public/build
+# Copy built Vite assets from build stage
+COPY --from=build /app/public/build /var/www/html/public/build
 
-# Permissions
+# Laravel permissions
 RUN mkdir -p storage bootstrap/cache \
  && chmod -R 775 storage bootstrap/cache \
  && chmod -R 755 public/build
 
-# Remove default nginx config
+# Nginx config
 RUN rm -f /etc/nginx/http.d/default.conf
-
-# Copy your configs
 COPY docker/nginx.conf /etc/nginx/http.d/default.conf
+
+# Supervisor config
 COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 EXPOSE 8080
