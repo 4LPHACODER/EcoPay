@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Inertia\Inertia;
+use Illuminate\Support\Facades\Auth;
 
 class LandingController extends Controller
 {
@@ -12,10 +12,11 @@ class LandingController extends Controller
      */
     public function __invoke(Request $request)
     {
-        if ($request->user()) {
+        if (Auth::check()) {
             return redirect()->route('dashboard');
         }
 
-        return Inertia::render('landing');
+        // Use the Blade template directly instead of Inertia
+        return view('landing');
     }
 }
