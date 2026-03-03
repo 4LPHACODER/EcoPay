@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use Illuminate\Http\Middleware\TrustProxies as Middleware;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\URL;
 
 class TrustProxies extends Middleware
 {
@@ -25,4 +26,17 @@ class TrustProxies extends Middleware
         Request::HEADER_X_FORWARDED_PORT |
         Request::HEADER_X_FORWARDED_PROTO |
         Request::HEADER_X_FORWARDED_AWS_ELB;
+
+    /**
+     * Handle an incoming request.
+     *
+     * Force HTTPS scheme in production when behind a proxy.
+     */
+    public function handle(Request $request, \Closure $next)
+    {
+        // Always force HTTPS scheme when behind a trusted proxy in production
+        URL::forceScheme('https');
+
+        return parent::handle($request, $next);
+    }
 }

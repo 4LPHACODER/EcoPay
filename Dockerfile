@@ -21,11 +21,26 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 # Copy project
 COPY . .
 
+# ========================================
+# CRITICAL: Set required env vars for Wayfinder
+# ========================================
+# Generate APP_KEY if not set (needed for artisan commands during build)
+RUN if [ -z "$APP_KEY" ]; then \
+    echo "APP_KEY not set, generating..."; \
+    php artisan key:generate --force; \
+    fi
+
+# Set APP_URL if not set (defaults for build)
+ENV APP_URL="${APP_URL:-http://localhost}"
+ENV ASSET_URL="${ASSET_URL:-}"
+ENV APP_ENV=production
+
 # Install PHP deps (needed for artisan during build)
 RUN composer install --no-dev --optimize-autoloader
 
 # Install JS deps + build Vite (Wayfinder runs here, PHP exists ✅)
-RUN npm ci && npm run build
+# Use --ignore-scripts to skip any post-install scripts that might fail
+RUN npm ci --ignore-scripts && npm run build
 
 
 ########################################
@@ -80,6 +95,9 @@ COPY docker/nginx.conf /etc/nginx/http.d/default.conf
 
 # Supervisor config
 COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+
+# Set PORT from Railway environment variable (default to 8080)
+ENV PORT="${PORT:-8080}"
 
 EXPOSE 8080
 

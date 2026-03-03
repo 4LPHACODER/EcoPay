@@ -4,10 +4,16 @@ import react from '@vitejs/plugin-react';
 import laravel from 'laravel-vite-plugin';
 import { defineConfig } from 'vite';
 
-export default defineConfig({
+export default defineConfig(({ command }) => ({
     plugins: [
         laravel({
-            input: ['resources/css/app.css', 'resources/js/app.jsx', 'resources/js/landing.js'],
+            input: [
+                'resources/css/app.css',
+                'resources/js/app.jsx',
+                'resources/js/landing.js',
+                'resources/js/analytics.js',
+                'resources/js/dashboard-realtime.js',
+            ],
             ssr: 'resources/js/ssr.tsx',
             refresh: true,
         }),
@@ -17,11 +23,10 @@ export default defineConfig({
             },
         }),
         tailwindcss(),
-        wayfinder({
-            formVariants: true,
-        }),
+        // Always enable Wayfinder - it generates types during build
+        wayfinder({ formVariants: true }),
     ],
     esbuild: {
         jsx: 'automatic',
     },
-});
+}));
