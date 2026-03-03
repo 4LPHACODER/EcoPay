@@ -13,5 +13,6 @@
     "env": {
       "PHP_VERSION": "8.2"
     }
-  }
+  },
+  "outputDirectory": "public"
 }
