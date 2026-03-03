@@ -2,41 +2,72 @@ import '../css/app.css';
 import { initializeTheme } from './hooks/use-appearance';
 
 import { createInertiaApp } from '@inertiajs/react';
-import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { createRoot } from 'react-dom/client';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
-// Helper to resolve page with case-insensitive matching
+// Helper to convert kebab-case or lowercase to PascalCase
+// e.g., "auth/login" -> "Auth/Login", "dashboard" -> "Dashboard"
+const toPascalCase = (str) => {
+    return str
+        .split('/')
+        .map((segment) =>
+            segment
+                .replace(/[-_\s]+(.)?/g, (_, c) => (c ? c.toUpperCase() : ''))
+                .replace(/^(.)/, (c) => c.toUpperCase()),
+        )
+        .join('/');
+};
+
+// Case-insensitive page resolver for Inertia
 const resolvePage = (name) => {
+    // Get all available pages
     const pages = import.meta.glob('./Pages/**/*.jsx', { eager: true });
-    const pagesLower = import.meta.glob('./pages/**/*.jsx', { eager: true });
     
-    // Try exact match first (PascalCase like Auth/Login)
+    // 1. Try exact match (e.g., "Dashboard" -> "./Pages/Dashboard.jsx")
     const exactPath = `./Pages/${name}.jsx`;
     if (pages[exactPath]) {
         return pages[exactPath];
     }
     
-    // Try lowercase path (like auth/login)
-    const lowerPath = `./pages/${name}.jsx`;
-    if (pagesLower[lowerPath]) {
-        return pagesLower[lowerPath];
+    // 2. Try with the name converted to PascalCase (e.g., "auth/login" -> "Auth/Login")
+    const pascalName = toPascalCase(name);
+    const pascalPath = `./Pages/${pascalName}.jsx`;
+    if (pages[pascalPath]) {
+        return pages[pascalPath];
     }
     
-    // Try case-insensitive match in Pages
-    const lowerName = name.toLowerCase();
+    // 3. Try case-insensitive search in all Pages
+    const normalizedName = name.toLowerCase();
     for (const [path, component] of Object.entries(pages)) {
-        const relativePath = path.replace('./Pages/', '').replace('.jsx', '').toLowerCase();
-        if (relativePath === lowerName) {
+        // Extract the relative path without "./Pages/" prefix and ".jsx" suffix
+        const relativePath = path.slice(2, -5); // Remove "./Pages/" and ".jsx"
+        if (relativePath.toLowerCase() === normalizedName) {
             return component;
         }
     }
     
-    // Fallback to resolvePageComponent
-    return resolvePageComponent(
-        `./Pages/${name}.jsx`,
-        pages,
+    // 4. Try additional common variations (Profile/Edit, etc.)
+    // If name is "profile", also try "Profile/Edit"
+    if (!name.includes('/')) {
+        const variations = [
+            `./Pages/${name}.jsx`,
+            `./Pages/Auth/${name}.jsx`,
+            `./Pages/Profile/Edit.jsx`,
+        ];
+        for (const variant of variations) {
+            if (pages[variant]) {
+                return pages[variant];
+            }
+        }
+    }
+    
+    // 5. If nothing found, throw a helpful error
+    const availablePages = Object.keys(pages).join(', ');
+    throw new Error(
+        `Page not found: ${name}.\n` +
+        `Tried: ${exactPath}, ${pascalPath}.\n` +
+        `Available pages: ${availablePages}`
     );
 };
 

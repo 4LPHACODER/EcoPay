@@ -9,7 +9,7 @@
     <link rel="apple-touch-icon" href="{{ asset('apple-touch-icon.png') }}">
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700,800&display=swap" rel="stylesheet" />
-    @vite(['resources/css/app.css', 'resources/js/landing.js'])
+    @vite(['resources/css/app.css', 'resources/js/app.jsx'])
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Figtree', sans-serif; overflow-x: hidden; }

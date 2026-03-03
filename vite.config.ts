@@ -10,7 +10,6 @@ export default defineConfig(({ command }) => ({
             input: [
                 'resources/css/app.css',
                 'resources/js/app.jsx',
-                'resources/js/landing.js',
                 'resources/js/analytics.js',
                 'resources/js/dashboard-realtime.js',
             ],
