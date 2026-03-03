@@ -1,5 +1,4 @@
 import { wayfinder } from '@laravel/vite-plugin-wayfinder';
-import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
 import laravel from 'laravel-vite-plugin';
 import { defineConfig } from 'vite';
@@ -16,13 +15,8 @@ export default defineConfig(({ command }) => ({
             ssr: 'resources/js/ssr.tsx',
             refresh: true,
         }),
-        react({
-            babel: {
-                plugins: ['babel-plugin-react-compiler'],
-            },
-        }),
-        tailwindcss(),
-        // Always enable Wayfinder - it generates types during build
+        react(),
+        // Wayfinder generates TypeScript types for Laravel routes
         wayfinder({ formVariants: true }),
     ],
     esbuild: {

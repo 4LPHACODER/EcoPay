@@ -30,12 +30,14 @@ class TrustProxies extends Middleware
     /**
      * Handle an incoming request.
      *
-     * Force HTTPS scheme in production when behind a proxy.
+     * Force HTTPS scheme in production when behind a proxy (like Railway).
      */
     public function handle(Request $request, \Closure $next)
     {
-        // Always force HTTPS scheme when behind a trusted proxy in production
-        URL::forceScheme('https');
+        // Only force HTTPS in production, not in local development
+        if (! $this->app->isLocal()) {
+            URL::forceScheme('https');
+        }
 
         return parent::handle($request, $next);
     }

@@ -21,28 +21,22 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // Force HTTPS in production OR when behind Railway proxy (APP_ENV not local)
-        // Check for Railway's environment indicator or any non-local environment
-        $isProductionLike = $this->app->environment('production') ||
-                            $this->app->environment() !== 'local';
-
-        if ($isProductionLike) {
+        // Force HTTPS in production (not local) for asset URLs behind Railway proxy
+        if (! $this->app->isLocal()) {
             URL::forceScheme('https');
 
-            // Force HTTPS for Vite assets via ASSET_URL config
+            // Configure ASSET_URL for Vite if not set
             $assetUrl = config('app.asset_url');
-            if ($assetUrl) {
-                // Ensure asset URL uses HTTPS
-                if (! str_starts_with($assetUrl, 'https://')) {
-                    $assetUrl = 'https://'.ltrim($assetUrl, 'https://');
-                    config(['app.asset_url' => $assetUrl]);
-                }
-            } else {
-                // If no ASSET_URL is set, default to using the app URL with https
+            if (empty($assetUrl)) {
                 $appUrl = config('app.url');
-                if ($appUrl && str_starts_with($appUrl, 'http://')) {
-                    config(['app.asset_url' => str_replace('http://', 'https://', $appUrl)]);
+                if ($appUrl) {
+                    // Use app URL with https scheme as asset URL
+                    $httpsUrl = str_replace('http://', 'https://', $appUrl);
+                    config(['app.asset_url' => $httpsUrl]);
                 }
+            } elseif (! str_starts_with($assetUrl, 'https://')) {
+                // Ensure existing ASSET_URL uses https
+                config(['app.asset_url' => 'https://'.ltrim($assetUrl, 'https://')]);
             }
         }
 
