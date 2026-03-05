@@ -3,19 +3,18 @@
 use Illuminate\Support\Str;
 
 return [
-
     /*
-    |--------------------------------------------------------------------------
+    |----------------------------------------------------------------------
     | Default Cache Store
-    |--------------------------------------------------------------------------
+    |----------------------------------------------------------------------
     |
-    | This option controls the default cache store that will be used by the
-    | framework. This connection is utilized if another isn't explicitly
-    | specified when running a cache operation inside the application.
+    | On serverless platforms use 'array' by default unless configured.
+    | Set CACHE_DRIVER to 'redis' or other store in Vercel if available.
     |
     */
 
-    'default' => env('CACHE_STORE', 'array'),
+    // Respect CACHE_DRIVER first, fallback to legacy CACHE_STORE, then to 'array'
+    'default' => env('CACHE_DRIVER', env('CACHE_STORE', 'array')),
 
     /*
     |--------------------------------------------------------------------------
@@ -33,7 +32,6 @@ return [
     */
 
     'stores' => [
-
         'array' => [
             'driver' => 'array',
             'serialize' => false,
@@ -98,7 +96,6 @@ return [
                 'array',
             ],
         ],
-
     ],
 
     /*
@@ -112,6 +109,5 @@ return [
     |
     */
 
-    'prefix' => env('CACHE_PREFIX', Str::slug((string) env('APP_NAME', 'laravel')).'-cache-'),
-
+    'prefix' => env('CACHE_PREFIX', Str::slug((string) env('APP_NAME', 'ecopay')).'-cache-'),
 ];
