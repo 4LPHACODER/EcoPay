@@ -1,0 +1,35 @@
+[33mfd45427[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m Fix Vercel Laravel runtime
+[33m837e177[m Fixing the Providers
+[33mad16867[m Fixing the Session Crash
+[33m8fed5f5[m Fixing the Auth Network
+[33m074489c[m Fix Fortify Inertia auth page case sensitivity
+[33m77bb820[m Cge daw Ipa run daw
+[33md6667bd[m Fixing the Network
+[33mb74b4d5[m Fixing the error
+[33m088131a[m Fixing the Vercel
+[33m0c243ac[m Update the Vite
+[33m396929d[m Fixing the Vercel
+[33m993914b[m Fixing the Vercel
+[33m5de6288[m Fixing the API
+[33m5e70dcc[m Fixing the Vercel
+[33m0687484[m Fixing the Server Side
+[33m01c81a3[m Fixing Login Page
+[33mf197eb1[m Fixing Login Page
+[33m2d24935[m Fixing Landing Page
+[33m505b525[m Fixing the vite
+[33m76dca58[m Fixing the vite
+[33mea93287[m Fixing the vite
+[33m9ce4f02[m Fixing the vite
+[33mef7af11[m Fixing the vite
+[33mb2890bc[m Fixing the vite
+[33m680bc65[m Fixing the vite
+[33m7e8db29[m Fixing the Dickerfile and directory
+[33m7d30bbe[m Fixing the Docker
+[33md5e7735[m Fixing the Docker File
+[33m80b9186[m Add Dockerfile for Render
+[33mce18d50[m Add Dockerfile for Render
+[33mec089cc[m Fixing the Database
+[33m5e4eff6[m Fixing the Database
+[33mae5d229[m Fixing the routes
+[33mede5104[m Fix Vite bootstrap import for production build
+[33m3e6ce11[m Initial commit
