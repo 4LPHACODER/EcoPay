@@ -33,4 +33,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::post('settings/sms-token/rotate', [SmsTokenController::class, 'rotate'])
         ->name('settings.sms-token.rotate');
+
+    Route::post('settings/sms-token/send-test', [SmsTokenController::class, 'sendTest'])
+        ->name('settings.sms-token.send-test');
 });

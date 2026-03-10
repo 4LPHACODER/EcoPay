@@ -8,11 +8,21 @@
         </div>
 
         @if(session('success'))
-            <div class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg flex items-center">
-                <svg class="w-5 h-5 mr-2 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+            <div class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg flex items-center gap-2">
+                <svg class="w-5 h-5 shrink-0" fill="currentColor" viewBox="0 0 20 20">
                     <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
                 </svg>
                 {{ session('success') }}
+            </div>
+        @endif
+
+        @if(session('test_success'))
+            <div class="bg-blue-50 border border-blue-200 text-blue-700 px-4 py-3 rounded-lg flex items-center gap-2">
+                <svg class="w-5 h-5 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/>
+                    <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/>
+                </svg>
+                {{ session('test_success') }}
             </div>
         @endif
 
@@ -103,6 +113,123 @@
             </div>
 
         </div>
+
+        <!-- Send Test SMS -->
+        <div class="bg-white p-6 rounded-lg border border-gray-200 shadow-sm space-y-5">
+
+            <div>
+                <h2 class="text-base font-semibold text-gray-900">Send a test SMS</h2>
+                <p class="mt-1 text-sm text-gray-500">
+                    Queue a message in the database. The mobile gateway will pick it up on the next poll of the GET endpoint.
+                </p>
+            </div>
+
+            <form method="POST" action="{{ route('settings.sms-token.send-test') }}" class="space-y-4">
+                @csrf
+
+                <div>
+                    <label for="recipient" class="block text-sm font-medium text-gray-700 mb-1">
+                        Recipient phone number
+                    </label>
+                    <input
+                        type="text"
+                        id="recipient"
+                        name="recipient"
+                        value="{{ old('recipient') }}"
+                        placeholder="+639XXXXXXXXX"
+                        maxlength="20"
+                        class="w-full rounded border @error('recipient') border-red-400 bg-red-50 @else border-gray-300 @enderror px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                    @error('recipient')
+                        <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div>
+                    <div class="flex items-center justify-between mb-1">
+                        <label for="message" class="block text-sm font-medium text-gray-700">
+                            Message
+                        </label>
+                        <span id="char-count" class="text-xs text-gray-400">0 / 160</span>
+                    </div>
+                    <textarea
+                        id="message"
+                        name="message"
+                        rows="4"
+                        maxlength="160"
+                        oninput="document.getElementById('char-count').textContent = this.value.length + ' / 160'"
+                        placeholder="Type your SMS message here…"
+                        class="w-full rounded border @error('message') border-red-400 bg-red-50 @else border-gray-300 @enderror px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent resize-none">{{ old('message') }}</textarea>
+                    @error('message')
+                        <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div class="flex items-center gap-3 pt-1">
+                    <button type="submit"
+                            @if(!$token) disabled @endif
+                            class="inline-flex items-center gap-2 rounded bg-green-600 hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed px-4 py-2 text-sm font-medium text-white transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
+                        </svg>
+                        Queue SMS
+                    </button>
+                    @if(!$token)
+                        <span class="text-xs text-gray-500">Generate a token first to enable sending.</span>
+                    @endif
+                </div>
+            </form>
+
+        </div>
+
+        <!-- Recent messages log -->
+        @if($recentMessages->isNotEmpty())
+        <div class="bg-white p-6 rounded-lg border border-gray-200 shadow-sm space-y-4">
+
+            <div class="flex items-center justify-between">
+                <h2 class="text-base font-semibold text-gray-900">Recent messages</h2>
+                <span class="text-xs text-gray-400">Last {{ $recentMessages->count() }} entries</span>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="min-w-full text-sm">
+                    <thead>
+                        <tr class="border-b border-gray-100">
+                            <th class="pb-2 text-left text-xs font-medium text-gray-500 pr-4">Recipient</th>
+                            <th class="pb-2 text-left text-xs font-medium text-gray-500 pr-4">Message</th>
+                            <th class="pb-2 text-left text-xs font-medium text-gray-500 pr-4">Status</th>
+                            <th class="pb-2 text-left text-xs font-medium text-gray-500">Queued</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-50">
+                        @foreach($recentMessages as $sms)
+                        <tr>
+                            <td class="py-2 pr-4 font-mono text-gray-800">{{ $sms->recipient }}</td>
+                            <td class="py-2 pr-4 text-gray-600 max-w-xs truncate">{{ $sms->message }}</td>
+                            <td class="py-2 pr-4">
+                                @if($sms->status === 'sent')
+                                    <span class="inline-flex items-center gap-1 rounded-full bg-green-50 px-2 py-0.5 text-xs font-medium text-green-700">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span> Sent
+                                    </span>
+                                @elseif($sms->status === 'failed')
+                                    <span class="inline-flex items-center gap-1 rounded-full bg-red-50 px-2 py-0.5 text-xs font-medium text-red-700">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-red-500"></span> Failed
+                                    </span>
+                                @else
+                                    <span class="inline-flex items-center gap-1 rounded-full bg-yellow-50 px-2 py-0.5 text-xs font-medium text-yellow-700">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-yellow-400"></span> Pending
+                                    </span>
+                                @endif
+                            </td>
+                            <td class="py-2 text-gray-400 text-xs whitespace-nowrap">{{ $sms->created_at->diffForHumans() }}</td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+        @endif
+
     </div>
 
     <script>

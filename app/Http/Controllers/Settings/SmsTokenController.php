@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Settings;
 
 use App\Http\Controllers\Controller;
+use App\Models\SmsMessage;
 use App\Models\SmsToken;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -16,11 +17,35 @@ class SmsTokenController extends Controller
             ->orderByDesc('id')
             ->first();
 
+        $recentMessages = SmsMessage::query()
+            ->latest()
+            ->limit(5)
+            ->get();
+
         return view('sms-token', [
             'token' => $token,
             'getEndpoint' => url('/api/sms/pending'),
             'putEndpoint' => url('/api/sms/123/sent'),
+            'recentMessages' => $recentMessages,
         ]);
+    }
+
+    public function sendTest(Request $request)
+    {
+        $request->validate([
+            'recipient' => ['required', 'string', 'max:20'],
+            'message' => ['required', 'string', 'max:160'],
+        ]);
+
+        SmsMessage::create([
+            'recipient' => $request->recipient,
+            'message' => $request->message,
+            'status' => 'pending',
+        ]);
+
+        return redirect()
+            ->back()
+            ->with('test_success', "Message queued for {$request->recipient}. The mobile gateway will pick it up on the next poll.");
     }
 
     public function rotate(Request $request)
