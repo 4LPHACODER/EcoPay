@@ -25,7 +25,7 @@ class SmsTokenController extends Controller
         return view('sms-token', [
             'token' => $token,
             'getEndpoint' => url('/api/sms/pending'),
-            'putEndpoint' => url('/api/sms/123/sent'),
+            'putEndpoint' => url('/api/sms/{id}/sent'),
             'recentMessages' => $recentMessages,
         ]);
     }

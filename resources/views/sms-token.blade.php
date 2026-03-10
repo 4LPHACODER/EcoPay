@@ -83,7 +83,7 @@
 
             <!-- PUT endpoint -->
             <div class="space-y-2">
-                <label class="text-sm font-medium text-gray-700">PUT endpoint example — mark as sent</label>
+                <label class="text-sm font-medium text-gray-700">PUT endpoint — mark as sent</label>
                 <div class="flex items-center gap-2">
                     <input type="text" readonly
                            id="field-put"
@@ -94,22 +94,48 @@
                         Copy
                     </button>
                 </div>
-                <p class="text-xs text-gray-500">Replace <code class="bg-gray-100 px-1 rounded">123</code> with the actual <code class="bg-gray-100 px-1 rounded">sms_messages.id</code>.</p>
+                <p class="text-xs text-gray-500">
+                    The Flutter app automatically replaces <code class="bg-gray-100 px-1 rounded">{id}</code> with each message's <code class="bg-gray-100 px-1 rounded">id</code> from the GET response.
+                    Paste this URL as-is into the <strong>putUrl</strong> field in the app.
+                </p>
             </div>
 
             <!-- Required header -->
             <div class="space-y-2">
-                <label class="text-sm font-medium text-gray-700">Required header for all requests</label>
+                <label class="text-sm font-medium text-gray-700">Authorization header (paste as token in the app)</label>
                 <div class="flex items-center gap-2">
                     <input type="text" readonly
                            id="field-header"
-                           value="X-Api-Token: {{ session('sms_token') ?: ($token?->token ?? '<your-token>') }}"
+                           value="{{ session('sms_token') ?: ($token?->token ?? '<your-token>') }}"
                            class="flex-1 rounded border border-gray-300 px-3 py-2 text-sm font-mono bg-gray-50 text-gray-800">
                     <button type="button" onclick="copyField('field-header')"
                             class="rounded border border-gray-300 bg-white px-3 py-2 text-xs font-medium text-gray-700 hover:bg-gray-50 transition-colors">
                         Copy
                     </button>
                 </div>
+                <p class="text-xs text-gray-500">
+                    The app sends this as <code class="bg-gray-100 px-1 rounded">Authorization: Bearer &lt;token&gt;</code>.
+                    Paste only the token value into the app's <strong>token</strong> field.
+                </p>
+            </div>
+
+            <!-- Response shape reference -->
+            <div class="space-y-2 pt-2 border-t border-gray-100">
+                <label class="text-sm font-medium text-gray-700">GET response shape</label>
+                <pre class="bg-gray-50 border border-gray-200 rounded px-3 py-2 text-xs font-mono text-gray-700 overflow-x-auto">{
+  "data": [
+    {
+      "id": 1,
+      "phone_number": "+639XXXXXXXXX",
+      "message": "Your OTP is 123456",
+      "status": "pending",
+      "created_at": "2026-03-10T12:00:00.000000Z"
+    }
+  ]
+}</pre>
+                <p class="text-xs text-gray-500">
+                    Set <strong>messageField</strong> in the app to <code class="bg-gray-100 px-1 rounded">message</code>.
+                </p>
             </div>
 
         </div>
