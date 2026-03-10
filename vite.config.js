@@ -10,6 +10,7 @@ export default defineConfig({
                 'resources/js/app.jsx',
                 'resources/js/landing.js',
                 'resources/js/dashboard-realtime.js',
+                'resources/js/analytics.js',
             ],
             refresh: true,
         }),
