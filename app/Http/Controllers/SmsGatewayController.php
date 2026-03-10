@@ -45,7 +45,7 @@ class SmsGatewayController extends Controller
         $tokenValue = (string) $request->header('X-Api-Token');
 
         if ($tokenValue === '') {
-            abort(Response::HTTP_UNAUTHORIZED, 'Invalid API token.');
+            abort(response()->json(['message' => 'Missing X-Api-Token header.'], Response::HTTP_UNAUTHORIZED));
         }
 
         $token = SmsToken::query()
@@ -54,7 +54,7 @@ class SmsGatewayController extends Controller
             ->first();
 
         if (! $token) {
-            abort(Response::HTTP_UNAUTHORIZED, 'Invalid API token.');
+            abort(response()->json(['message' => 'Invalid or inactive API token.'], Response::HTTP_UNAUTHORIZED));
         }
 
         $token->forceFill([
