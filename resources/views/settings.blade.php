@@ -175,6 +175,24 @@
             </div>
         </form>
 
+        <!-- SMS Gateway Token -->
+        <div class="bg-white p-6 rounded-lg border border-gray-200 shadow-sm max-w-lg">
+            <div class="flex items-center mb-3">
+                <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-green-600">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
+                    </svg>
+                </div>
+                <h3 class="font-medium text-gray-800 ml-3">SMS Gateway Token</h3>
+            </div>
+            <p class="text-sm text-gray-600 mt-2">Generate or rotate the API token used by the mobile app to send SMS messages.</p>
+            <div class="mt-4">
+                <a href="{{ route('settings.sms-token.edit') }}" class="inline-flex items-center bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200">
+                    Manage SMS Token
+                </a>
+            </div>
+        </div>
+
         <!-- Danger Zone -->
         <div class="bg-white p-6 rounded-lg border border-red-100 shadow-sm max-w-lg">
             <div class="flex items-center mb-3">

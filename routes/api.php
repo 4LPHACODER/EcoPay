@@ -10,3 +10,11 @@
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
+
+use App\Http\Controllers\SmsGatewayController;
+use Illuminate\Support\Facades\Route;
+
+Route::middleware('throttle:60,1')->group(function () {
+    Route::get('sms/pending', [SmsGatewayController::class, 'pending']);
+    Route::put('sms/{smsMessage}/sent', [SmsGatewayController::class, 'markSent']);
+});

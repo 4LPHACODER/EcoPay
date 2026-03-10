@@ -17,7 +17,8 @@
     @inertiaHead
 
     <!-- Vite -->
-    @vite(['resources/css/app.css', 'resources/js/app.jsx'])
+    @viteReactRefresh
+    @vite(['resources/css/app.css', 'resources/js/app.tsx'])
 </head>
 <body class="font-sans antialiased bg-gray-50">
     <!-- Inertia root -->
