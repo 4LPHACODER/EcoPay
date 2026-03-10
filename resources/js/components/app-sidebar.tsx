@@ -36,12 +36,12 @@ export function AppSidebar() {
     const mainNavItems: NavItem[] = [
         {
             title: 'Dashboard',
-            href: dashboard(),
+            href: dashboard.url(),
             icon: LayoutGrid,
         },
         {
             title: 'Settings',
-            href: settings(),
+            href: settings.url(),
             icon: Settings,
             isActive: currentUrl.startsWith('/settings'),
         },
@@ -53,7 +53,7 @@ export function AppSidebar() {
                 <SidebarMenu>
                     <SidebarMenuItem>
                         <SidebarMenuButton size="lg" asChild>
-                            <Link href={dashboard()} prefetch>
+                            <Link href={dashboard.url()} prefetch>
                                 <AppLogo />
                             </Link>
                         </SidebarMenuButton>

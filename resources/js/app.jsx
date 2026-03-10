@@ -16,16 +16,12 @@ const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
 const pages = {
     ...import.meta.glob('./Pages/**/*.jsx', { eager: true }),
-    ...import.meta.glob('./pages/**/*.tsx', { eager: true }),
 };
 
 createInertiaApp({
     title: (title) => `${title} - ${appName}`,
     resolve: (name) => {
-        const jsxKey = `./Pages/${name}.jsx`;
-        const tsxKey = `./pages/${name}.tsx`;
-
-        const page = pages[tsxKey] ?? pages[jsxKey];
+        const page = pages[`./Pages/${name}.jsx`];
 
         if (!page) {
             throw new Error(`Page not found: ${name}`);
